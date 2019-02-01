@@ -84,5 +84,5 @@ app.get('/about', async (req, res) => {
 
 
 app.listen(process.env.PORT, ()=>{
-    console.log(`server listening on port: ${port}`);
+    console.log(`server listening on port ${process.env.PORT}`);
 })
