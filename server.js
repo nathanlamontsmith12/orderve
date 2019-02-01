@@ -1,4 +1,5 @@
 require('./db/db');
+require('dotenv').config();
 const express               = require('express');
 const app                   = express();
 const morgan                = require('morgan');
@@ -83,6 +84,6 @@ app.get('/about', async (req, res) => {
 });
 
 
-app.listen(port, ()=>{
+app.listen(process.env.PORT, ()=>{
     console.log(`server listening on port: ${port}`);
 })
