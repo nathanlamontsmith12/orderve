@@ -8,7 +8,6 @@ const bodyParser            = require('body-parser');
 const methodOverride        = require('method-override');
 const session               = require('express-session');
 var MongoDBStore            = require('connect-mongodb-session')(session);
-const port                  = 3000;
 const Users                 = require('./models/User');
 const Events                = require('./models/Event');
 // const Services              = require('./models/Service');
