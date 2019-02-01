@@ -22,18 +22,6 @@ router.get('/', async (req,res)=>{
     }
 });
 
-// new route (does registration take care of this?)
-router.get('/new', (req,res)=>{
-    // Make your profile
-    // res.render('users/new.ejs');
-});
-
-// create route (does registration take care of this?)
-router.post('/', async (req,res)=>{
-    // Submit your new profile
-    // MONGO: .create(req.body)
-    // Redirect to your Show Page
-});
 
 // show route
 router.get('/:id', async (req,res)=>{
