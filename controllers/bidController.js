@@ -150,4 +150,56 @@ router.delete('/:id', async (req,res)=>{
     }
 })
 
+
+// PATCH route -- change status of bid to/from accepted 
+router.patch('/:id', async (req, res)=>{
+
+        // req.body.accepted == either yes or no
+
+        const update = {};
+
+    if (req.body.accepted === "yes") {
+        update.accepted = true;
+    } else {
+        update.accepted = false;
+    }
+            
+     try{
+        // most of this code copied from above and adapted slightly 
+        // update the bid to change only the updated acceptance status 
+        const bid = await Bids.findByIdAndUpdate(req.params.id, update, {new: true});
+
+        console.log("updated bid: ", bid);
+
+        // find all places that the bid lives, and capture them in constants: 
+        const foundService = await Services.findOne({'bids._id': req.params.id});
+        const user = await Users.findById(req.session.userId);
+        const event = await Events.findOne({'services._id': req.params.id});
+
+        // update in the foundService FIRST 
+        await foundService.bids.id(req.params.id).remove();  
+        await foundService.bids.push(bid);
+        await foundService.save();
+
+        // find the bid in the users' services' bids array, remove, push updated bid, SAVE
+        const updatedBidInUserServices = await user.services.id(foundService._id).bids.id(req.params.id).remove();
+        await user.services.id(foundService._id).bids.push(bid);
+        await user.save();
+
+        // find the bid in the events services array remove and push updated
+        const updatedBidInEventServices = await event.services.id(req.params.id).remove();
+        console.log('events =============');
+        console.log(updatedBidInEventServices);
+        event.services.push(bid);
+        await event.save();
+
+        // redirect to bid show page
+        res.redirect(`/bids/${req.params.id}`);
+    }catch(err){
+        res.send(err);
+        console.log(err);
+    }
+})
+
+
 module.exports = router;
