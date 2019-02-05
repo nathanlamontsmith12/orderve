@@ -5,6 +5,7 @@ const serviceSchema = mongoose.Schema({
     title: {type: String, required: true},
     images: String,
     about: String,
+    hostId: String,
     bids: [Bids.schema]
 });
 

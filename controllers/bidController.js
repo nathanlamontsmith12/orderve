@@ -169,12 +169,14 @@ router.patch('/:id', async (req, res)=>{
         // update the bid to change only the updated acceptance status 
         const bid = await Bids.findByIdAndUpdate(req.params.id, update, {new: true});
 
-        console.log("updated bid: ", bid);
-
         // find all places that the bid lives, and capture them in constants: 
         const foundService = await Services.findOne({'bids._id': req.params.id});
-        const user = await Users.findById(req.session.userId);
+        const user = await Users.findById(bid.hostId);
         const event = await Events.findOne({'services._id': req.params.id});
+
+        console.log("found service: ", foundService);
+        console.log("found user: ", user);
+        console.log("found event: ", event);
 
         // update in the foundService FIRST 
         await foundService.bids.id(req.params.id).remove();  
@@ -182,14 +184,14 @@ router.patch('/:id', async (req, res)=>{
         await foundService.save();
 
         // find the bid in the users' services' bids array, remove, push updated bid, SAVE
+        // The Problem is in the next line of CODE!!! 
+
         const updatedBidInUserServices = await user.services.id(foundService._id).bids.id(req.params.id).remove();
         await user.services.id(foundService._id).bids.push(bid);
         await user.save();
 
         // find the bid in the events services array remove and push updated
         const updatedBidInEventServices = await event.services.id(req.params.id).remove();
-        console.log('events =============');
-        console.log(updatedBidInEventServices);
         event.services.push(bid);
         await event.save();
 

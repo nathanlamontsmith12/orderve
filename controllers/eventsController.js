@@ -134,7 +134,15 @@ router.post('/', async (req, res) => {
     console.log(req.session);
     if(req.session.logged == true) {
         try {
-            const newEvent = await Events.create(req.body);
+
+            // construct data object for event 
+            const event = req.body;
+            // add hostId to it 
+            event.hostId = req.session.userId;
+
+            console.log("new event: ", event);
+
+            const newEvent = await Events.create(event);
             const host = await Users.findById(req.session.userId)
             host.events.push(newEvent);
             host.save()

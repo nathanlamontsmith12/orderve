@@ -52,8 +52,15 @@ router.get('/new', (req,res)=>{
 router.post('/', async (req,res)=>{
     
     try{
+        
+        const newService = req.body;
+        newService.hostId = req.session.userId;
+
+        // need hostId saved on the document created in the database 
+
         const user = await Users.findById(req.session.userId); // find user based on id
-        const createdService = await Services.create(req.body); // create the service in the collection
+ 
+        const createdService = await Services.create(newService); // create the service in the collection
         user.services.push(createdService); // add the service to the user's array of services
         await user.save();
         res.redirect("/users/" + user._id); // redirect to the users show page
