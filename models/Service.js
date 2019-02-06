@@ -6,7 +6,7 @@ const serviceSchema = mongoose.Schema({
     images: String,
     about: String,
     hostId: String,
-    bids: [Bids.schema]
+    // bids: [Bids.schema]
 });
 
 module.exports = mongoose.model('Service', serviceSchema);

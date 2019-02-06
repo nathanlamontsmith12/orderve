@@ -4,6 +4,7 @@ const Users         = require('../models/User');
 const Events        = require('../models/Event');
 const Services      = require('../models/Service');
 const Bids          = require('../models/Bid');
+
 //new bid
 router.get('/new/:id', async (req,res)=>{
     try{
