@@ -129,6 +129,62 @@ router.put('/:id', async (req, res)=>{
     }
 });
 
+
+// PATCH route -- change status of bid to/from accepted 
+router.patch('/:id', async (req, res)=>{
+
+        // req.body.accepted == either yes or no
+
+        const update = {};
+
+    if (req.body.accepted === "yes") {
+        update.accepted = true;
+        update.bossId = req.session.userId;
+    } else {
+        update.accepted = false;
+        update.bossId = null;
+    }
+            
+     try{
+        // most of this code copied from above and adapted slightly 
+        // update the bid to change only the updated acceptance status 
+        const bid = await Bids.findByIdAndUpdate(req.params.id, update, {new: true});
+
+        // find all places that the bid lives, and capture them in constants: 
+        const foundService = await Services.findOne({'bids._id': req.params.id});
+        const bidder = await Users.findById(bid.bidderId);
+        const event = await Events.findOne({'services._id': req.params.id});
+
+        console.log("found service: ", foundService);
+        console.log("found user: ", bidder);
+        console.log("found event: ", event);
+
+        // update in the foundService FIRST 
+        await foundService.bids.id(req.params.id).remove();  
+        await foundService.bids.push(bid);
+        await foundService.save();
+
+        // find the bid in the users' services' bids array, remove, push updated bid, SAVE
+        // The Problem is in the next line of CODE!!! 
+
+        const updatedBidInUserServices = await bidder.services.id(foundService._id).bids.id(req.params.id).remove();
+        await bidder.services.id(foundService._id).bids.push(bid);
+        await bidder.save();
+
+        // find the bid in the events services array remove and push updated
+        const updatedBidInEventServices = await event.services.id(req.params.id).remove();
+        event.services.push(bid);
+        await event.save();
+
+        // redirect to bid show page
+        res.redirect(`/bids/${req.params.id}`);
+    }catch(err){
+        res.send(err);
+        console.log(err);
+    }
+})
+
+
 router.delete('/:id', async (req,res)=>{
     try{
         const bid = await Bids.findByIdAndDelete(req.params.id);
