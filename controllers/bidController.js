@@ -30,11 +30,18 @@ router.get('/new/:id', async (req,res)=>{
 //create bid
 router.post('/events/:id/', async (req,res)=>{
     try{
+        // find event first to get "bossId" for the new bid 
+        const foundEvent = await Events.findById(req.params.id);
+
+
         const newBid = req.body;
         newBid.bidderId = req.session.userId;
+        newBid.bossId = foundEvent.hostId;
+
         const createdBid = await Bids.create(newBid);
 
-        const foundEvent = await Events.findById(req.params.id);
+        console.log("created Bid: ", createdBid);
+
         const currentUser = await Users.findById(req.session.userId);
         const currentServiceId = currentUser.services[0]._id;
         const currentService = await Services.findById(currentServiceId);
