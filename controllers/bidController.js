@@ -149,10 +149,8 @@ router.patch('/:id', async (req, res)=>{
 
     if (req.body.accepted === "yes") {
         update.accepted = true;
-        update.bossId = req.session.userId;
     } else {
         update.accepted = false;
-        update.bossId = null;
     }
             
      try {
@@ -170,7 +168,7 @@ router.patch('/:id', async (req, res)=>{
         // 1. service.bids in DB
         // 2. event.services in DB 
         // 3. user.events.services for the BOSS user -- update WITh updated event from 1, save 
-        // 4. user.services[0].bids on BIDDER user -- update WITH updated service.bids from 2, save 
+        // 4. user.services.bids on BIDDER user -- update WITH updated service.bids from 2, save 
 
 
         // first, capture these NOW, before shit gets WEIRD: 
@@ -223,7 +221,7 @@ router.patch('/:id', async (req, res)=>{
         console.log("updated boss User: ", updatedBossUser);
 
 
-        // 4. user.services[0].bids on BIDDER user -- update WITH updated service.bids from 2, save 
+        // 4. user.services.bids on BIDDER user -- update WITH updated service.bids from 2, save 
         const bidderServiceIndex = bidder.services.findIndex((service)=>{
             if (service._id.toString()===foundServiceIdString) {
                 return true;
@@ -245,53 +243,6 @@ router.patch('/:id', async (req, res)=>{
         console.log(err);
     }
 })
-
-        // different iterations of stuff while figuring out above code: 
-
-        // await foundService.bids.id(req.params.id).remove();  
-        // await foundService.bids.push(bid);
-        // await foundService.save();
-
-        // // find the bid in the users' services' bids array and remove it then push it
-        // const updatedBidInUserServices = await user.services.id(foundService._id).bids.id(req.params.id).remove();
-        // console.log(updatedBidInUserServices);
-        // await user.services.id(foundService._id).bids.push(bid);
-        // await user.save();
-
-        // // find the bid in the events services array remove and push updated
-        // const updatedBidInEventServices = await event.services.id(req.params.id).remove();
-        // console.log('events =============');
-        // console.log(updatedBidInEventServices);
-        // event.services.push(bid);
-        // await event.save();
-
-
-
-        // const foundService = await Services.findOne({'bids._id': req.params.id});
-        // const bidder = await Users.findById(bid.bidderId);
-        // const event = await Events.findOne({'services._id': req.params.id});
-
-        // console.log("found service: ", foundService);
-        // console.log("found user: ", bidder);
-        // console.log("found event: ", event);
-
-        // // update in the foundService FIRST 
-        // await foundService.bids.id(req.params.id).remove();  
-        // await foundService.bids.push(bid);
-        // await foundService.save();
-
-        // // find the bid in the users' services' bids array, remove, push updated bid, SAVE
-        // // The Problem is in the next line of CODE!!! 
-
-        // const updatedBidInUserServices = await bidder.services.id(foundService._id).bids.id(req.params.id).remove();
-        // await bidder.services.id(foundService._id).bids.push(bid);
-        // await bidder.save();
-
-        // // find the bid in the events services array remove and push updated
-        // const updatedBidInEventServices = await event.services.id(req.params.id).remove();
-        // event.services.push(bid);
-        // await event.save();
-
 
 
 router.delete('/:id', async (req,res)=>{
